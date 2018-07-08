@@ -1,0 +1,323 @@
+---
+title: "Primary School Data"
+author: "Anuj Verma"
+date: "October 14, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+setwd("/Users/Gurpreet/Documents/Coding practices/R")
+read_chunk("primary_school.R")
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r C1, results='hide',warning=FALSE,message=FALSE}
+
+```
+
+## Read graphs for Day1 and Day2
+
+```{r C2}
+
+```
+
+## Summary of Day1 and Day2 graphs
+
+```{r C3}
+```
+
+## Create grades 1-5 for students
+Create new vertex attribute ```grade``` based on the current ```classname``` attribute. Students are assigned to grades 1-5 and teachers are assigned to grade 6.
+```{r C4}
+
+```
+
+
+## Log-Log plot for Contact Duration comparison of Day 1 and Day 2
+```{r C5}
+
+```
+
+## Log-Log plot for Number of contacts made in a day by different pairs of individuals
+```{r C6}
+
+```
+
+## Network Filtering
+a) Delete edges with contact duration less than 2mins.
+b) Delete edges with number of contacts less than 2.
+c) Assign contact duration value as new edge weights.
+```{r C7}
+
+```
+
+## Save the new networks and create visualizations in gephi
+```{r C8}
+
+```
+
+### Day 1
+The high degree nodes have larger size than the low degree nodes. The color of nodes represent grades. Pink - 1, green- 2, skyblue-3, darkgray-4, orange-5. The edge weight represents total contact duration between two nodes.
+```{r,out.width="800px"}
+knitr::include_graphics("Visualization_day1.png")
+```
+
+### Day 2
+The high degree nodes have larger size than the low degree nodes. The color of nodes represent grades. Pink - 1, green- 2, skyblue-3, darkgray-4, orange-5. The edge weight represents total contact duration between two nodes.
+```{r,out.width="800px"}
+knitr::include_graphics("Visualization_day2.png")
+```
+
+
+## Homophily across the classrooms
+```{r C9}
+
+```
+
+
+## Homophily across different grades
+```{r C10}
+
+```
+
+## CUG test for Assortativity by gender
+```{r C11a}
+
+```
+
+
+## CUG test for Assortativity by grade
+```{r C11b}
+
+```
+
+
+## QAP test for Assortativity by gender
+```{r C12a}
+
+```
+
+
+## QAP test for Assortativity by grade
+```{r C12b}
+
+```
+
+
+## ERGM Models
+We are implementing ERGM model on a ```grade 1``` network which is a very simple version of the network. Due to high computational requirements of this model, it was not possible to run this model to check the homophily within multiple grades. 
+```{r C13}
+
+```
+
+Load all saved ergm models.
+```{r C14load}
+
+```
+
+
+###Model 1: Edges and nodemix classname
+1B-1B is considered as base.
+```{r C15}
+
+```
+####M1: GOF
+```{r C15a}
+
+```
+
+###Model 2: Edges, class nodemix and degree
+M1 + degree(10)
+```{r C16}
+
+```
+####M2: GOF
+```{r C16a}
+
+```
+
+Model is a good fit for degree and esp.
+
+####M2: Diagnostics
+```{r C16b}
+
+```
+
+Let us try something else to see if auto-correlation and Geweke statistics can be improved further.
+
+###Model 2a: Model 2 with Geweke tweaks
+```{r C17}
+
+```
+
+####M2a: GOF
+```{r C17a}
+
+```
+
+####M2a: Diagnostics
+```{r C17b}
+
+```
+
+###Model 3: Differentiating High degree nodes by gender
+```{r C18}
+
+```
+
+####M3: GOF
+```{r C18a}
+
+```
+
+####M3: Diagnostics
+```{r C18b}
+
+```
+The Geweke statistics are week in this model. Try changing burnin value
+
+###Model 3a: Model 3 with Gweke tweaks
+```{r C19}
+
+```
+####M3a: GOF
+```{r C19a}
+
+```
+
+####M3b: Diagnostics
+```{r C19b}
+
+```
+
+#####The best model for ```classname``` is Model 2 with edges, nodemix and degree 10.
+
+###Model 6: edges and nodemix ```gender``` 
+```{r C20}
+
+```
+
+####M6: GOF
+```{r C20a}
+
+```
+###Model 7: M6 + degree(10)
+```{r C21}
+
+```
+
+####M7: GOF
+```{r C21a}
+
+```
+
+Model is not a good fit for edgewise-shared parter. 
+
+####M7: Diagnostics
+```{r C21b}
+
+```
+
+Geweke statistics are very low. There is a high chance that the means of 1st 10% of iterations and last 50% of iterations came from same distribution.
+
+Let us try to Fit GOF model using gwesp
+
+###Other Models tried to fit for gender mix
+```{r C22}
+
+```
+
+###Model 14: Combine M2 and M7 ie mix classname, mix gender and homophily for gender at degree 10.
+```{r C23}
+
+```
+
+####M14: GOF
+```{r C23a}
+
+```
+GOF for this model shows good results. Let us check diagnostics.
+
+####M14: Diagnostics
+```{r C23b}
+
+```
+Cross-correlation, auto-correlation and Geweke stats are good. Overall this model is good, but let us try one more model with nodematch on gender.
+
+###Model 16: Edges, nodemix ```classname```, nodematch ```gender``` and degree 10
+```{r C24}
+
+```
+
+####M16: GOF
+```{r C24a}
+
+```
+
+Goodness of Fit shows good results for this model.
+
+####M16: Diagnostics
+```{r C24b}
+
+```
+
+Cross-correlation and auto-correlation values are high, but Geweke statistics show low p-value. Let us try increasing the sample interval.
+
+###Model 16a: M16 with Geweke tweaks
+```{r C25}
+
+```
+
+####M16a: GOF
+```{r C25a}
+
+```
+
+####M16a: Diagnostics
+```{r C25b}
+
+```
+
+p-value is high now. This means that samples came from different distributions. We will use this model for grade1 network of day 2.
+
+###Implement Model 16a to Grade 1 network of day-2
+```{r C26load}
+
+```
+
+```{r C27}
+
+```
+
+####M16a: Day2 GOF
+```{r C27a}
+
+```
+
+####M16a: Diagnostics
+```{r C27b}
+
+```
+p-value is high. Cross-correlation and auto correlation values are high too. Overall a good model.
+
+
+###Simulated versions of Day 1 and Day 2 Models
+The pink nodes represent Female students and blue nodes represent Male students. The two groups visible in the graph are for class A and B.
+```{r C28, out.width='800px'}
+
+```
+
+### Edge Probability of Female-Female edge vs Male-Male edge for both days
+```{r C29}
+
+```
+
+For grade 1 network, the edge probability is high for Male-Male nodes for both the days. Males have almost same interaction for both days within grade 1 network. For Females interacted less on day2 as compared to day1.
+
+### ERGM Limitations
+The above ERGM model only simulates the Grade1 network. We should know that there are total 5 grades where these stats may be different. These grades have exhibit both inter-grade and intra-grade connections. Hence, this model and finding should not be genralized for any other part of the network or whole network.
+
+###Future Works
+We can try to fit this model one by one on each grade seperately and try to fit this model for 2grades at a time. If this works then we may be able to study the network characteristics more accurately.
+
